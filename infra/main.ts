@@ -15,7 +15,7 @@ new aws.iam.RolePolicyAttachment(getResourceName("lambdaRolePolicyAttachment"), 
 const lambda = new aws.lambda.Function(getResourceName("lambdaFunction"), {
   runtime: aws.lambda.Runtime.NodeJS18dX,
   role: lambdaRole.arn,
-  handler: "handler.handler",
+  handler: "app.handler",
   timeout: 15,
   memorySize: 1024,
   code: new pulumi.asset.AssetArchive({

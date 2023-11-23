@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ValiError, parse } from "valibot";
+import { AccessDeniedException, BadRequestException } from "./app/exceptions";
 import WorkPermitsResponseSchema from "./models/WorkPermitsResponseSchema";
 import { verifyConsent } from "./services/Testbed";
 import { retrieveWorkPermitsData } from "./services/WorkPermitsService";
@@ -17,6 +18,8 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       body: JSON.stringify(workPermitsResponse),
     };
   } catch (error: any) {
+    console.error(error);
+
     let statusCode = 500;
     let errorType = error.type || "Internal Server Error";
     let errorMessage = error.message;
@@ -24,10 +27,12 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     if (error instanceof ValiError) {
       statusCode = 422;
       errorType = "Validation Error";
-
-      console.error(JSON.stringify(error, null, 4));
-    } else {
-      console.error(error);
+    } else if (error instanceof AccessDeniedException) {
+      statusCode = 403;
+      errorType = "Access Denied";
+    } else if (error instanceof BadRequestException) {
+      statusCode = 400;
+      errorType = "Bad Request";
     }
 
     return {
