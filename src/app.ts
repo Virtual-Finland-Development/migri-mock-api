@@ -31,7 +31,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       statusCode = 403;
       errorType = "Access Denied";
     } else if (error instanceof BadRequestException) {
-      statusCode = 400;
+      statusCode = 403;
       errorType = "Bad Request";
     }
 

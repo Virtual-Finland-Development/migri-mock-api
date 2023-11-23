@@ -1,5 +1,6 @@
 import { Jwt, JwtHeader, JwtPayload, decode, verify } from "jsonwebtoken";
 import jwktopem from "jwk-to-pem";
+import { AccessDeniedException, BadRequestException } from "./exceptions";
 
 export function decodeIdToken(idToken: string) {
   return decode(idToken, { complete: true });
@@ -24,13 +25,14 @@ export async function getPublicKey(decodedToken: Jwt | null, issuerConfig: { iss
 
   // Verify input token
   if (typeof keyId !== "string" || typeof payload !== "object" || payload === null) {
-    throw new Error("Bad request");
+    console.log(decodedToken);
+    throw new BadRequestException("Invalid token resolved from the ID token");
   }
 
   // Verify issuer before fetching the public key
   const { iss } = payload;
   if (iss !== issuerConfig.issuer) {
-    throw new Error("Invalid issuer");
+    throw new AccessDeniedException("Invalid issuer");
   }
 
   const key = await getJwksKey(keyId, issuerConfig.jwksUri);
@@ -40,12 +42,12 @@ export async function getPublicKey(decodedToken: Jwt | null, issuerConfig: { iss
 async function getJwksKey(keyId: string, jwksUri: string): Promise<jwktopem.JWK> {
   const jwks = await fetch(jwksUri).then((res) => res.json());
   if (!(jwks.keys instanceof Array)) {
-    throw new Error("Invalid jwks endpoint");
+    throw new Error("Invalid JWKS endpoint");
   }
 
   const key = jwks.keys.find((key: JwtHeader) => key.kid === keyId);
   if (!key) {
-    throw new Error("Public key not found in the jwks endpoint");
+    throw new AccessDeniedException("Public key not found in the JWKS endpoint");
   }
   return key;
 }

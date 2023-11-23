@@ -52,6 +52,7 @@ function retrieveRequestTokens(headers: APIGatewayProxyEventHeaders) {
   if (!consentToken) {
     throw new BadRequestException("Consent is required");
   }
+  console.log(consentToken, headers);
 
   return { idToken, consentToken };
 }
