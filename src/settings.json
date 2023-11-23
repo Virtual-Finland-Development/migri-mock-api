@@ -1,0 +1,6 @@
+{
+  "consent": {
+    "dataSourceDsi": "dpp://virtual_finland:development@testbed.fi/Permits/WorkPermit_v0.1",
+    "provider": { "issuer": "https://consent.testbed.fi", "jwksUri": "https://consent.testbed.fi/.well-known/jwks.json" }
+  }
+}

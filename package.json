@@ -1,0 +1,25 @@
+{
+  "name": "migri-mock-api",
+  "version": "1.0.0",
+  "description": "Productizer for mocking API responses of migri-kausityöntekijäkokeilu",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "npm run build && pulumi -C infra up"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "jwk-to-pem": "^2.0.5",
+    "valibot": "^0.21.0"
+  },
+  "devDependencies": {
+    "@pulumi/aws": "^6.10.0",
+    "@pulumi/pulumi": "^3.94.2",
+    "@types/aws-lambda": "^8.10.129",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/jwk-to-pem": "^2.0.3",
+    "@types/node": "^20.9.4",
+    "typescript": "^5.3.2"
+  }
+}

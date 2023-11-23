@@ -1,0 +1,6 @@
+name: wif-job-recommendations
+description: Productizer API for job recommendations
+runtime: nodejs
+main: main.ts
+config:
+  aws:region: eu-north-1
