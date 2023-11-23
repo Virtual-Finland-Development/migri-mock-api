@@ -1,5 +1,5 @@
-name: wif-job-recommendations
-description: Productizer API for job recommendations
+name: migri-mock-api
+description: Productizer API for migri mock data
 runtime: nodejs
 main: main.ts
 config:

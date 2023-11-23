@@ -7,7 +7,6 @@ const lambdaRole = new aws.iam.Role(getResourceName("lambdaRole"), {
   tags,
 });
 
-// Attach the AWSLambdaBasicExecutionRole
 new aws.iam.RolePolicyAttachment(getResourceName("lambdaRolePolicyAttachment"), {
   role: lambdaRole,
   policyArn: aws.iam.ManagedPolicies.AWSLambdaBasicExecutionRole,
@@ -16,8 +15,8 @@ new aws.iam.RolePolicyAttachment(getResourceName("lambdaRolePolicyAttachment"), 
 const lambda = new aws.lambda.Function(getResourceName("lambdaFunction"), {
   runtime: aws.lambda.Runtime.NodeJS18dX,
   role: lambdaRole.arn,
-  handler: "app.handler",
-  timeout: 30,
+  handler: "handler.handler",
+  timeout: 15,
   memorySize: 1024,
   code: new pulumi.asset.AssetArchive({
     ".": new pulumi.asset.FileArchive("../dist"),
