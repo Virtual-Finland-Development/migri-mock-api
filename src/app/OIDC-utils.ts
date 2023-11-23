@@ -25,7 +25,6 @@ export async function getPublicKey(decodedToken: Jwt | null, issuerConfig: { iss
 
   // Verify input token
   if (typeof keyId !== "string" || typeof payload !== "object" || payload === null) {
-    console.log(decodedToken);
     throw new BadRequestException("Invalid token resolved from the ID token");
   }
 
