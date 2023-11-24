@@ -12,11 +12,16 @@ export async function verifyIdToken(idToken: string, issuerConfig: { issuer: str
 
   // Validate token
   const publicKey = await getPublicKey(tokenResult, issuerConfig);
-  const verified = verify(idToken, publicKey.pem, { ignoreExpiration: false });
-  return {
-    payload: verified as JwtPayload,
-    header: tokenResult?.header as any,
-  };
+
+  try {
+    const verified = verify(idToken, publicKey.pem, { ignoreExpiration: false });
+    return {
+      payload: verified as JwtPayload,
+      header: tokenResult?.header as any,
+    };
+  } catch (error) {
+    throw new AccessDeniedException(error);
+  }
 }
 
 export async function getPublicKey(decodedToken: Jwt | null, issuerConfig: { issuer: string; jwksUri: string }): Promise<{ pem: string; key: jwktopem.JWK }> {
