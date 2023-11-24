@@ -3,7 +3,11 @@ import jwktopem from "jwk-to-pem";
 import { AccessDeniedException, BadRequestException } from "./exceptions";
 
 export function decodeIdToken(idToken: string) {
-  return decode(idToken, { complete: true });
+  try {
+    return decode(idToken, { complete: true });
+  } catch (error) {
+    throw new AccessDeniedException(error);
+  }
 }
 
 export async function verifyIdToken(idToken: string, issuerConfig: { issuer: string; jwksUri: string }): Promise<{ payload: JwtPayload; header: Record<string, string | number> }> {

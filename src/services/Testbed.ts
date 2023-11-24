@@ -17,7 +17,7 @@ export async function verifyConsent(headers: APIGatewayProxyEventHeaders, dataSo
   }
 
   const decodedIdToken = decodeIdToken(idToken);
-  if (decodedIdToken === null || typeof decodedIdToken.payload !== "object") {
+  if (typeof decodedIdToken?.payload !== "object" || decodedIdToken?.payload === null) {
     throw new AccessDeniedException("Invalid idToken");
   }
 
