@@ -2,10 +2,28 @@ import { Jwt, JwtHeader, JwtPayload, decode, verify } from "jsonwebtoken";
 import jwktopem from "jwk-to-pem";
 import { AccessDeniedException, BadRequestException } from "./exceptions";
 
+type ExpectedJwt = Jwt & { payload: JwtPayload; header: JwtHeader & { kid: string } };
+
 export function decodeIdToken(idToken: string) {
   try {
-    return decode(idToken, { complete: true });
+    const decodedToken = decode(idToken, { complete: true });
+
+    if (!decodedToken) {
+      throw new BadRequestException("Invalid token");
+    }
+    if (typeof decodedToken?.header.kid !== "string") {
+      throw new BadRequestException("Invalid token key id");
+    }
+    // Accept only object payloads
+    if (typeof decodedToken?.payload !== "object" || decodedToken?.payload === null) {
+      throw new BadRequestException("Invalid token payload");
+    }
+
+    return decodedToken as ExpectedJwt;
   } catch (error) {
+    if (error instanceof BadRequestException) {
+      throw error;
+    }
     throw new AccessDeniedException(error);
   }
 }
@@ -14,7 +32,7 @@ export async function verifyIdToken(idToken: string, issuerConfig: { issuer: str
   // Decode token
   const tokenResult = decodeIdToken(idToken);
 
-  // Validate token
+  // Verify token
   const publicKey = await getPublicKey(tokenResult, issuerConfig);
 
   try {
@@ -28,14 +46,9 @@ export async function verifyIdToken(idToken: string, issuerConfig: { issuer: str
   }
 }
 
-export async function getPublicKey(decodedToken: Jwt | null, issuerConfig: { issuer: string; jwksUri: string }): Promise<{ pem: string; key: jwktopem.JWK }> {
-  const keyId = decodedToken?.header.kid;
-  const payload = decodedToken?.payload;
-
-  // Verify input token
-  if (typeof keyId !== "string" || typeof payload !== "object" || payload === null) {
-    throw new BadRequestException("Invalid token resolved from the ID token");
-  }
+export async function getPublicKey(decodedToken: ExpectedJwt, issuerConfig: { issuer: string; jwksUri: string }): Promise<{ pem: string; key: jwktopem.JWK }> {
+  const keyId = decodedToken.header.kid;
+  const payload = decodedToken.payload;
 
   // Verify issuer before fetching the public key
   const { iss } = payload;
